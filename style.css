@@ -1,0 +1,34 @@
+<style>
+    /* Button styles */
+    #factButton {
+        background-color: red; /* Red background */
+        border: 5px solid silver; /* Silver border */
+        color: transparent; /* No text on the button */
+        width: 100px; /* Button width */
+        height: 100px; /* Button height */
+        border-radius: 50%; /* Round button */
+        cursor: pointer; /* Pointer on hover */
+        transition: transform 0.3s ease-in-out; /* Smooth transition for movement */
+    }
+
+    #factButton:hover {
+        background-color: darkred; /* Dark red on hover */
+        transform: translate(50px, 50px); /* Move the button when hovered */
+    }
+
+    /* Handwritten font and bigger text for the instruction */
+    body {
+        font-family: 'Patrick Hand', cursive;
+        font-size: 24px;
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    #factText {
+        font-size: 36px;  /* Larger text for facts */
+    }
+
+    #instruction {
+        font-size: 28px;  /* Text size for the instruction */
+    }
+</style>

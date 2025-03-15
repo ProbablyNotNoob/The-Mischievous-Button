@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Don't Click the Button!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap" rel="stylesheet"> <!-- Messy handwriting font -->
+    <style>
+        body {
+            font-family: 'Rock Salt', cursive; /* Messy handwriting font */
+            font-size: 24px;
+            text-align: center;
+            margin-top: 50px;
+            background-image: url('https://www.transparenttextures.com/patterns/crumpled-paper.png'); /* Crumpled paper background */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+
+        #factButton, #reactionButton, #extraButton {
+            border: 5px solid silver;
+            color: transparent;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s, background-color 0.3s ease-in-out;
+            position: absolute;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0, 0, 0, 0.2); /* Enhanced 3D effect */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 16px;
+            color: white;
+        }
+
+        #factButton {
+            background-color: red;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #factButton:hover {
+            background-color: darkred;
+        }
+
+        #reactionButton {
+            background-color: green;
+            top: 50%;
+            left: calc(50% - 150px); /* Position to the left of the fact button */
+            transform: translate(-50%, -50%);
+            display: none; /* Initially hidden */
+        }
+
+        #reactionButton:hover {
+            background-color: darkgreen;
+        }
+
+        #extraButton {
+            background-color: red;
+            top: 50%;
+            left: calc(50% + 150px); /* Position to the right of the fact button */
+            transform: translate(-50%, -50%);
+            display: none; /* Initially hidden */
+        }
+
+        #extraButton:hover {
+            background-color: darkred;
+        }
+
+        #factText {
+            font-size: 36px;
+        }
+
+        #instruction {
+            font-size: 28px;
+        }
+
+        .reactionText {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <h1 id="instruction">Press the Button</h1>
+    <button id="factButton">Click Me!</button>
+    <button id="reactionButton">You Pressed Me!</button>
+    <button id="extraButton">What Else?</button>
+    <p id="factText"></p>
+    <p id="reactionText" class="reactionText" style="display:none;"></p>
+
+    <script>
+        // List of diverse facts with reactions
+        const facts = [
+            { text: "Did you know a group of flamingos is called a 'flamboyance'?", reaction: "That's fascinating!" },
+            { text: "Honey never spoils. Archaeologists have found pots of honey in ancient tombs.", reaction: "Gross but interesting!" },
+            { text: "Octopuses have three hearts and blue blood. Can you believe that?", reaction: "How wild is that?" },
+            { text: "Bananas are berries, but strawberries are not. Mind-blowing, right?", reaction: "That's a surprising twist!" },
+            { text: "Wombat poop is cube-shaped. Nature is quirky!", reaction: "That's pretty weird!" },
+            { text: "Sharks have been around longer than trees. Imagine that!", reaction: "That's incredible!" },
+            { text: "There are more stars in the universe than grains of sand on all of Earth's beaches.", reaction: "That's mind-boggling!" },
+            { text: "A snail can sleep for three years. Talk about a long nap!", reaction: "That's crazy!" },
+            { text: "The shortest war in history lasted 38 minutes. Can you believe it?", reaction: "That's a quick battle!" },
+            { text: "A day on Venus is longer than a year on Venus. How does that even work?", reaction: "That's puzzling!" }
+        ];
+
+        let clickCount = 0;
+        let isButtonMoving = false; // Flag to control button movement
+        const factButton = document.getElementById("factButton");
+        const reactionButton = document.getElementById("reactionButton");
+        const extraButton = document.getElementById("extraButton");
+        const factText = document.getElementById("factText");
+        const reactionText = document.getElementById("reactionText");
+        const instruction = document.getElementById("instruction");
+        let lastFactIndex = -1; // Track the last fact index to avoid repetition
+
+        // Function to make the speech
+        function speak(text, pitch = 1, rate = 1) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.pitch = pitch; // Set the pitch
+            utterance.rate = rate;   // Set the rate
+            speechSynthesis.speak(utterance);
+        }
+
+        // Function to give a fact
+        function giveFact() {
+            if (clickCount > 3 && clickCount < 50) { // Only give facts after the initial dialogue and until 50 clicks
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * facts.length);
+                } while (randomIndex === lastFactIndex); // Ensure the fact is not repeated
+                
+                lastFactIndex = randomIndex; // Update last fact index
+                const randomFact = facts[randomIndex];
+                factText.textContent = randomFact.text;
+                reactionText.textContent = randomFact.reaction;
+                reactionText.style.display = "block"; // Show reaction text
+                speak(randomFact.text, 1.2, 1.2); // Speak the fact with excitement
+                reactionButton.style.display = "block"; // Show the reaction button
+                extraButton.style.display = "block"; // Show the extra button
+            }
+        }
+
+        // Button click behavior
+        factButton.addEventListener("click", () => {
+            clickCount++;
+
+            // Dialogue before facts are given
+            if (clickCount === 1) {
+                instruction.textContent = "Hey! Don't click me!";
+                factButton.textContent = "Really, don't!";
+                speak("Hey! Don't click me! I really mean it!");
+            } else if (clickCount === 2) {
+                instruction.textContent = "Why did you click me again?";
+                factButton.textContent = "Curiosity, huh?";
+                speak("Why did you click me again? You're really curious, aren't you?");
+            } else if (clickCount === 3) {
+                instruction.textContent = "Fine, if you insist...";
+                factButton.textContent = "Okay, here goes!";
+                speak("Fine, if you insist, I'll tell you something interesting.");
+                isButtonMoving = false; // Stop the button from moving
+            }
+
+            // Move the button if it's not the third click
+            if (clickCount < 3) {
+                const randomX = Math.random() * 300 - 150; // Random horizontal movement
+                const randomY = Math.random() * 300 - 150; // Random vertical movement
+                factButton.style.transform = `translate(${randomX}px, ${randomY}px)`;
+                isButtonMoving = true; // Allow movement on the next click
+            }
+
+            // Give a fact, limiting to one fact per few clicks
+            if (clickCount % 3 === 0) {
+                giveFact();
+            }
+
+            // After 50 clicks, trigger confetti explosion
+            if (clickCount === 50) {
+                confetti();
+                instruction.textContent = "You clicked the button 50 times! Here comes the confetti!";
+                factButton.style.display = "none"; // Hide the button after explosion
+                reactionButton.style.display = "none"; // Hide the reaction button
+                extraButton.style.display = "none"; // Hide the extra button
+            }
+        });
+
+        // Reaction button behavior
+        reactionButton.addEventListener("click", () => {
+            const reactionMessage = reactionText.textContent;
+            speak(reactionMessage); // Speak the reaction
+            reactionText.style.display = "none"; // Hide the reaction text after responding
+            reactionButton.style.display = "none"; // Hide the reaction button
+            extraButton.style.display = "none"; // Hide the extra button
+            instruction.textContent = "You really want to know more, huh?";
+            speak(instruction.textContent); // Speak the new instruction
+        });
+
+        // Extra button behavior for more options
+        extraButton.addEventListener("click", () => {
+            const randomExtraResponse = "Ah, you're persistent!";
+            speak(randomExtraResponse); // Speak the extra response
+            factText.textContent = "Did you know that sloths can hold their breath longer than dolphins?";
+            reactionText.textContent = "That's pretty cool!";
+            reactionText.style.display = "block"; // Show new reaction text
+            reactionButton.style.display = "block"; // Show the reaction button again
+            extraButton.style.display = "none"; // Hide the extra button after use
+            instruction.textContent = "What else would you like to know?";
+            speak(instruction.textContent); // Speak the new instruction
+        });
+
+        // Button hover behavior
+        factButton.addEventListener("mouseenter", () => {
+            if (isButtonMoving) {
+                const randomX = Math.random() * 300 - 150; // Random horizontal movement
+                const randomY = Math.random() * 300 - 150; // Random vertical movement
+                factButton.style.transform = `translate(${randomX}px, ${randomY}px)`; // Move to a new position
+            }
+        });
+
+        // Start the dialogue as soon as the page loads
+        window.onload = function() {
+            instruction.innerHTML = "Press the button to start!";
+        }
+    </script>
+</body>
+</html>
+
